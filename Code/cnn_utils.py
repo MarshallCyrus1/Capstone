@@ -58,11 +58,10 @@ def plot_confusion_matrix(predictions,labels,p=0.5):
 
 def get_predictions(model,data):
   """Expects a TF Dataset"""
-  predicted=[]
-  labels=[]
-  for x, y in data:
-    predicted.append(model.predict(x))
-    labels.append(y)
-
-  
-  return np.concatenate(predicted), np.concatenate(labels)
+  preds = np.array([])
+  labels = np.array([])
+  for feature, label in data: 
+ 
+    preds = np.concatenate([preds,np.ravel(model.predict(feature))])
+    labels=np.concatenate([labels,np.array(label)])
+  return preds, labels
