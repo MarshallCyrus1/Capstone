@@ -5,6 +5,7 @@ Code/Cropped Images/.DS_Store
 Code/Cropped Images.zip
 Code/Cropped Images/Idiotswithguns.zip
 Code/Cropped Images/.DS_Store
+Code/dataset_final
 Code/adverse
 Code/out_of_sample
 Code/dataset_1
@@ -14,3 +15,6 @@ Code/.ipynb_checkpoints/3_resize_crop-checkpoint.ipynb
 Code/.ipynb_checkpoints/6_Initial_CNN-checkpoint.ipynb
 Code/.ipynb_checkpoints/maintained_files-checkpoint.csv
 Code/.ipynb_checkpoints/6_Initial_CNN-checkpoint.ipynb
+.ipynb_checkpoints/Download Data-checkpoint.ipynb
+Code/.ipynb_checkpoints/Finalize Dataset-checkpoint.ipynb
+Code/Cropped Images/.DS_Store
