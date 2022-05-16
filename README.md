@@ -1,11 +1,15 @@
 # Capstone
 Final DS 222 Capstone
 
+## Packages/Install requirements
+Scipy, TensorFlow, & PIL
+
+
 # Object detection with neural network classification
 ### Contrastive language image processing with threatening photographs
 
 ## The Problem
-Nueral network and object detection is a promenient and emergent area of study. With cameras and photographs avaialble in abundance all around the world, many wish to be able to interpret and in my case reduce threats around the world. This project pushes the limits of classification to analyze image data and make a compelling prediction on whether a person is holding a weapon. 
+Nueral network and object detection is a promenient and emergent area of study. With cameras and photographs avaialble in abundance all around the world, many wish to be able to interpret and in my case reduce threats globally. This project pushes the limits of classification to analyze image data and make a compelling prediction on whether a person is holding a weapon. 
 
 ## Background
 ### Threat reduction and image interpretation
@@ -15,33 +19,31 @@ After ammassing photos it next became the challenge of orienting them and both m
 
 ## Data Formatting and Modeling
 ### Data Source, Formatting, and Cleaning
-Photos were gathered from a Github repo known as OD weapon detection master set( URL ), otherwise images were webscraped from reddit and google. Second to last, I provided a unique dataset of my own photographs replicated in similar scenarios and classifified into two distinct groups (human with gun and without). Finally, I supplied an adversarial dataset with images desgined to confuse the model (humans holding packages, guitars, and golf clubs).
+Photos were gathered from a Github repo known as OD weapon detection master set( URL ), otherwise images were webscraped from reddit and google. I provided a unique dataset of my own photographs replicated in similar scenarios and classifified into two distinct groups (human with gun and without). Finally, I supplied an adversarial dataset with images desgined to confuse the model (humans holding packages and guitars).
 
-At first, 
+At first, the images needed to be resized and cropped into a 256 by 256 format so as to save space and training time for the model. A large amount of these images were noisy and unproductive to my problem statement of a person weilding a firearm. In order to combat this I chose to use CLIP (Contrastive Language Image Processing) model to organize and select images containing my desired output. To choose these images CLIP needed a caption and a probability cuttoff which had to be determined from manual inspection. 
 
-In all versions, newlines were preserved in the data. This was done in an effort to allow the model to learn where to insert a newline on its own. In versions where the punctuation was removed, newlines were replaced with the word "newline", which was not part of the original vocabulary. In processing of the model output, "newline" was replaced with a newline.
+![CLIP workflow](Readme_images/CLIP.png)
+^ CLIP pre-trains an image encoder and a text encoder to predict which images were paired with which texts in a dataset. Then it uses this behavior to turn CLIP into a zero-shot classifier, converting all of a dataset’s classes into captions and predict the class of the caption CLIP estimates best pairs with a given image. (source: https://openai.com/blog/clip/)
 
-The words in each line were later divided, using a moving window technique. Data was reformatted to include a single word, its preceding word, and the word coming after it. This was done for two, three, and four word windows. Although more words would allow for more context, this would go beyond the typical length of a sonnet line.
+Example of the CLIP process
+![Image grid without CLIP](Readme_images/1_clip_example.png)
+![Image grid with CLIP](Readme_images/2_clip_example.png)
 
 ### Modeling
-Initially, the input for the models were transformed into binary arrays with one-hot encoding. This was then used to train a neural network with LSTM and Dense layers. These models were trained with two and three word starter phrases and their following words. In all cases, these models did not produce meaningful results. In one case, the only word a model would predict was "wardrobe".
-
-This led to a revamping of how modeling had been approached. Rather than preprocessing the data with a one-hot encoder, the data was preprocessed using Keras's Sequential tool, and an embedding layer was added to the model. This model was then trained on four-word sequences and their following word. The results of this were much more cogent and meaningful.  
+The final model consists of rescaling and augementation layers, and a pretrained inception model (with frozen imagenet weights), with a 128 size dense "head" connected to a single binary output neuron.The model was trained using a 80:20 training/validation split using the resized images collected from the various sources. The model was trained until convergence using binary cross entropy as the loss function, at which point it was evaluated on the validation and out of sample datasets.
 
 ## Observations
-There were a few hurdles in this project, most of which focused on the data formatting and what the model would be trained on. These challenges were deciding how many words should be included in the starter text, what format the data should be in to train the model on, deciding to include an embedding layer, and other such difficulties. From the modeling (and remodeling) process it is gleamed that it is much better to preprocess the input text by sequencing rather than one-hot encoding, since one-hot encoding is best meant for categorical data. While a case can be made that natural language generation is categorical since it is about determining what word in the present vocabulary *should* come next, it is also about the relationship between words and the context they are placed in. Sequencing words and using an embedding layer allow for word relationships and context to be taken into account.
+Overall there were a multitude of image collection challenges with images not including humans or falsely labeled as containing a firearm.  
 
-This resulted in a neural network that produced this, among other, generated poetry samples:
-(this generated sample has not be reformatted other than to replace "newline" with an actual newline)
->rose whose beauty yea i
-i least wilt
-and
-hear that trees makest seek
-i do of your desire
+However the results from the final neural network model using transfer learning were strong (90%+ for accuracy) for the in sample dataset. Following this modeling process, It was important to use a out of sample dataset and to also include an adversarial dataset as well.
 
-The results from this model are cogent and have some meaning to a human. This generated text could be expressing a desire for someone so strong it is crushing, causing the person to wilt. It could be touching on how in the search for someone's affections hope springs eternal.
-
-As thought-inpsiring as the output from this model may be, it does not abide by the strict structure of Shakespearean sonnets. There is no rhyming, and the syllable count for each line is varied. This means that unregulated output from a NLG model will not naturally abide by the strict structure of a Shakespearean sonnet.
+The metrics for the OOS(out of sample) dataset were slightly less but that is to be expected.
+![Text](Readme_images/OOS_results.png)
 
 ## Next Steps
-From here there are a few different avenues to pursue. In the interest of generating consistent sonnets that fit the Shakespearean structure, restrictions can be placed on what generated word will be part of the final product. With these restrictions controls can be put in place for both rhyme and metrics. 
+At this point there is a clear path forward, which would be to increase the image size and amount of total images available to feed into the modeling process. 
+
+As someone who wants to use this implementation of object detection in the real world it is paramount to make sure the objects detected are accurate up to 99.9% of cases. Since this is a matter of security and potentially lives could be at risk the model process needs to be airtight and reliable. 
+
+I am confident that with access to more images and a more stable training dataset that this process could be improved and implemented as a security failsafe anywhere. 
